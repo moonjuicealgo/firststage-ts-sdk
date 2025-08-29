@@ -1,0 +1,27 @@
+{
+  "name": "firststage-sdk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && node patch-generated.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@algorandfoundation/algokit-utils": "^9.1.0",
+    "algosdk": "^3.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "eslint": "^9.34.0",
+    "jest": "^30.1.1",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.1"
+  }
+}
