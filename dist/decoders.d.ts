@@ -1,9 +1,14 @@
 export interface AssetInformation {
+    admin_account: string;
+    main_pool: string;
+    liquidity_target: string;
     project_tax_bps: bigint;
     burn_tax_bps: bigint;
     reflection_tax_bps: bigint;
     freeze_tax_bps: bigint;
+    liquidity_tax_bps: bigint;
     freeze_reward_bps: bigint;
+    max_freeze_reward: bigint;
     liquidity_deposit_bps: bigint;
     eligible_for_reflections_total: bigint;
     freeze_rewards_available: bigint;
@@ -13,6 +18,7 @@ export interface AssetInformation {
     tokens_collected: bigint;
     algo_collected: bigint;
     pending_project_tax: bigint;
+    pending_liquidity_tax: bigint;
     buy_tax: boolean;
     sell_tax: boolean;
     taxes_in_algo: boolean;
@@ -24,5 +30,14 @@ export interface UserAssetInfo {
     claimable_freeze_rewards: bigint;
     registered_balance: bigint;
 }
+export interface UserDepositInfo {
+    locked_asset_id: bigint;
+    lp_deposit: bigint;
+    locked_lp_tokens: bigint;
+    lp_app_id: bigint;
+    second_locked_asset_id: bigint;
+    second_lp_deposit: bigint;
+}
 export declare function decodeAssetBox(bytes: Uint8Array): AssetInformation;
+export declare function decodeUserDepositBox(bytes: Uint8Array): UserDepositInfo;
 //# sourceMappingURL=decoders.d.ts.map

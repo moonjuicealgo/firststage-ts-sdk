@@ -1,3 +1,4 @@
+import algosdk from "algosdk";
 export function decodeAssetBox(bytes) {
     const view = new DataView(bytes.buffer);
     const readUint64BE = (offset) => {
@@ -5,33 +6,61 @@ export function decodeAssetBox(bytes) {
         const low = view.getUint32(offset + 4, false);
         return BigInt(high) * 2n ** 32n + BigInt(low);
     };
-    const flags = bytes[192] ?? 0;
-    const buy_tax = (flags & 0b10000000) !== 0;
-    const sell_tax = (flags & 0b01000000) !== 0;
-    const taxes_in_algo = (flags & 0b00100000) !== 0;
-    const total_tax_bps = readUint64BE(64) +
-        readUint64BE(72) +
-        readUint64BE(80) +
-        readUint64BE(88);
+    const admin_account = algosdk.encodeAddress(bytes.slice(0, 32));
+    const main_pool = algosdk.encodeAddress(bytes.slice(32, 64));
+    const liquidity_target = algosdk.encodeAddress(bytes.slice(104, 136));
+    const buy_tax = bytes[248] === 1;
+    const sell_tax = bytes[249] === 1;
+    const taxes_in_algo = bytes[250] === 1;
+    const total_tax_bps = readUint64BE(64) + // project
+        readUint64BE(72) + // burn
+        readUint64BE(80) + // reflection
+        readUint64BE(88) + // freeze
+        readUint64BE(96); // liquidity
     return {
+        admin_account,
+        main_pool,
+        liquidity_target,
         project_tax_bps: readUint64BE(64),
         burn_tax_bps: readUint64BE(72),
         reflection_tax_bps: readUint64BE(80),
         freeze_tax_bps: readUint64BE(88),
-        freeze_reward_bps: readUint64BE(96),
-        liquidity_deposit_bps: readUint64BE(104),
-        eligible_for_reflections_total: readUint64BE(128),
-        freeze_rewards_available: readUint64BE(136),
-        reflections_tokens_available: readUint64BE(144),
-        reflections_algo_available: readUint64BE(152),
-        minimum_reflections: readUint64BE(160),
-        tokens_collected: readUint64BE(168),
-        algo_collected: readUint64BE(176),
-        pending_project_tax: readUint64BE(184),
+        liquidity_tax_bps: readUint64BE(96),
+        freeze_reward_bps: readUint64BE(136),
+        max_freeze_reward: readUint64BE(144),
+        liquidity_deposit_bps: readUint64BE(152),
+        eligible_for_reflections_total: readUint64BE(176),
+        freeze_rewards_available: readUint64BE(184),
+        reflections_tokens_available: readUint64BE(192),
+        reflections_algo_available: readUint64BE(200),
+        minimum_reflections: readUint64BE(208),
+        tokens_collected: readUint64BE(216),
+        algo_collected: readUint64BE(224),
+        pending_project_tax: readUint64BE(232),
+        pending_liquidity_tax: readUint64BE(240),
         buy_tax,
         sell_tax,
         taxes_in_algo,
-        total_tax_bps
+        total_tax_bps,
+    };
+}
+export function decodeUserDepositBox(bytes) {
+    if (bytes.length < 48) {
+        throw new Error("UserDeposit box too short, expected at least 48 bytes");
+    }
+    const view = new DataView(bytes.buffer);
+    const readUint64BE = (offset) => {
+        const high = view.getUint32(offset, false);
+        const low = view.getUint32(offset + 4, false);
+        return BigInt(high) * 2n ** 32n + BigInt(low);
+    };
+    return {
+        locked_asset_id: readUint64BE(0),
+        lp_deposit: readUint64BE(8),
+        locked_lp_tokens: readUint64BE(16),
+        lp_app_id: readUint64BE(24),
+        second_locked_asset_id: readUint64BE(32),
+        second_lp_deposit: readUint64BE(40)
     };
 }
 //# sourceMappingURL=decoders.js.map
